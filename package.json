@@ -1,0 +1,24 @@
+{
+  "name": "contact_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test-generate-coverfile": "go test -coverprofile=coverage.out ./...",
+    "test-exec-cover-html": "go tool cover -func=coverage.out",
+    "test-export-html": "go tool cover -html=coverage.out",
+    "test": "npm run test-generate-coverfile && npm run test-exec-cover-html && npm run test-export-html",
+    "go-path": "PATH=$(go env GOPATH)/bin:$PATH",
+    "api-docs": "swag init -g src/main.go  --output src/docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crewhu/contact_api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/crewhu/contact_api/issues"
+  },
+  "homepage": "https://github.com/crewhu/contact_api#readme"
+}

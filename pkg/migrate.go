@@ -17,6 +17,7 @@ type collectionSpecification struct {
 }
 
 type versionRecord struct {
+	Type        string    `bson:"type"`
 	Version     uint64    `bson:"version"`
 	Description string    `bson:"description,omitempty"`
 	Timestamp   time.Time `bson:"timestamp"`
@@ -48,8 +49,6 @@ func NewMigrate(db *mongo.Database, migrations ...Migration) *Migrate {
 	}
 }
 
-// SetMigrationsCollection replaces name of collection for storing migration information.
-// By default it is "migrations".
 func (m *Migrate) SetMigrationsCollection(name string) {
 	m.migrationsCollection = name
 }
@@ -155,11 +154,12 @@ func (m *Migrate) Version() (uint64, string, error) {
 }
 
 // SetVersion forcibly changes database version to provided.
-func (m *Migrate) SetVersion(version uint64, description string) error {
+func (m *Migrate) SetVersion(version uint64, description string, typing string) error {
 	rec := versionRecord{
 		Version:     version,
 		Timestamp:   time.Now().UTC(),
 		Description: description,
+		Type:        typing,
 	}
 
 	_, err := m.db.Collection(m.migrationsCollection).InsertOne(context.TODO(), rec)
@@ -185,14 +185,14 @@ func (m *Migrate) Up(n int) error {
 
 	for i, p := 0, 0; i < len(m.migrations) && p < n; i++ {
 		migration := m.migrations[i]
-		if migration.Version <= currentVersion || migration.Up == nil {
+		if migration.Version <= currentVersion || migration.Handler == nil {
 			continue
 		}
 		p++
-		if err := migration.Up(m.db); err != nil {
+		if err := migration.Handler.Execute(); err != nil {
 			return err
 		}
-		if err := m.SetVersion(migration.Version, migration.Description); err != nil {
+		if err := m.SetVersion(migration.Version, migration.Description, migration.Handler.GetType()); err != nil {
 			return err
 		}
 	}
@@ -214,11 +214,11 @@ func (m *Migrate) Down(n int) error {
 
 	for i, p := len(m.migrations)-1, 0; i >= 0 && p < n; i-- {
 		migration := m.migrations[i]
-		if migration.Version > currentVersion || migration.Down == nil {
+		if migration.Version > currentVersion || migration.Handler == nil {
 			continue
 		}
 		p++
-		if err := migration.Down(m.db); err != nil {
+		if err := migration.Handler.Fallback(); err != nil {
 			return err
 		}
 
@@ -228,7 +228,7 @@ func (m *Migrate) Down(n int) error {
 		} else {
 			prevMigration = m.migrations[i-1]
 		}
-		if err := m.SetVersion(prevMigration.Version, prevMigration.Description); err != nil {
+		if err := m.SetVersion(prevMigration.Version, prevMigration.Description, migration.Handler.GetType()); err != nil {
 			return err
 		}
 	}

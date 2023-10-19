@@ -1,4 +1,6 @@
-module github.com/xakep666/mongo-migrate
+module github.com/Vinicius-Santos-da-Silva/mongo-migrate
+
+go 1.20
 
 require (
 	github.com/pkg/errors v0.9.1

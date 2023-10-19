@@ -22,8 +22,15 @@ type MigrationFunc func(db *mongo.Database) error
 type Migration struct {
 	Version     uint64
 	Description string
-	Up          MigrationFunc
-	Down        MigrationFunc
+	Handler     MigrationHandler
+}
+
+type MigrationHandler interface {
+	GetVersion() uint64
+	GetType() string
+	GetName() string
+	Execute() error
+	Fallback() error
 }
 
 func migrationSort(migrations []Migration) {
