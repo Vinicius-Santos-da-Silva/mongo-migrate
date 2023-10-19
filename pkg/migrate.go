@@ -189,7 +189,7 @@ func (m *Migrate) Up(n int) error {
 			continue
 		}
 		p++
-		if err := migration.Handler.Execute(); err != nil {
+		if err := migration.Handler.Up(); err != nil {
 			return err
 		}
 		if err := m.SetVersion(migration.Version, migration.Description, migration.Handler.GetType()); err != nil {
@@ -218,7 +218,7 @@ func (m *Migrate) Down(n int) error {
 			continue
 		}
 		p++
-		if err := migration.Handler.Fallback(); err != nil {
+		if err := migration.Handler.Down(); err != nil {
 			return err
 		}
 

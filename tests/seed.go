@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	fmt.Println("Execute seeds...")
+	fmt.Println("Up seeds...")
 
 	database, err := pkg.MongoConnect("test-migrations")
 	pkg.SetDatabase(database)

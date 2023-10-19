@@ -29,8 +29,8 @@ type MigrationHandler interface {
 	GetVersion() uint64
 	GetType() string
 	GetName() string
-	Execute() error
-	Fallback() error
+	Up() error
+	Down() error
 }
 
 func migrationSort(migrations []Migration) {

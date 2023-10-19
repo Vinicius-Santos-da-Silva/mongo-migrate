@@ -38,7 +38,7 @@ func (ami *addMyIndex) GetVersion() uint64 {
 	return ami.version
 }
 
-func (ami *addMyIndex) Execute() error {
+func (ami *addMyIndex) Up() error {
 	fmt.Println("Executing seed test...Register")
 
 	opt := options.Index().SetName("my-index")
@@ -53,7 +53,7 @@ func (ami *addMyIndex) Execute() error {
 	return nil
 }
 
-func (ami *addMyIndex) Fallback() error {
+func (ami *addMyIndex) Down() error {
 	fmt.Println("Executing seed test...Register")
 
 	_, err := ami.db.Collection("my-coll").Indexes().DropOne(context.TODO(), "my-index")
