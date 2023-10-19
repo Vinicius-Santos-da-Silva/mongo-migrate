@@ -1,4 +1,3 @@
-// Package migrate allows to perform versioned migrations in your MongoDB.
 package migrate
 
 import (
@@ -25,14 +24,8 @@ type versionRecord struct {
 
 const defaultMigrationsCollection = "migrations"
 
-// AllAvailable used in "Up" or "Down" methods to run all available migrations.
 const AllAvailable = -1
 
-// Migrate is type for performing migrations in provided database.
-// Database versioned using dedicated collection.
-// Each migration applying ("up" and "down") adds new document to collection.
-// This document consists migration version, migration description and timestamp.
-// Current database version determined as version in latest added document (biggest "_id") from collection mentioned above.
 type Migrate struct {
 	db                   *mongo.Database
 	migrations           []Migration
@@ -125,7 +118,6 @@ func (m *Migrate) getCollections() (collections []collectionSpecification, err e
 	return
 }
 
-// Version returns current database version and comment.
 func (m *Migrate) Version() (uint64, string, error) {
 	if err := m.createCollectionIfNotExist(m.migrationsCollection); err != nil {
 		return 0, "", err
@@ -153,7 +145,6 @@ func (m *Migrate) Version() (uint64, string, error) {
 	return rec.Version, rec.Description, nil
 }
 
-// SetVersion forcibly changes database version to provided.
 func (m *Migrate) SetVersion(version uint64, description string, typing string) error {
 	rec := versionRecord{
 		Version:     version,
@@ -170,9 +161,6 @@ func (m *Migrate) SetVersion(version uint64, description string, typing string) 
 	return nil
 }
 
-// Up performs "up" migrations to latest available version.
-// If n<=0 all "up" migrations with newer versions will be performed.
-// If n>0 only n migrations with newer version will be performed.
 func (m *Migrate) Up(n int) error {
 	currentVersion, _, err := m.Version()
 	if err != nil {
@@ -199,9 +187,6 @@ func (m *Migrate) Up(n int) error {
 	return nil
 }
 
-// Down performs "down" migration to oldest available version.
-// If n<=0 all "down" migrations with older version will be performed.
-// If n>0 only n migrations with older version will be performed.
 func (m *Migrate) Down(n int) error {
 	currentVersion, _, err := m.Version()
 	if err != nil {

@@ -39,8 +39,6 @@ func (ami *addMyIndex) GetVersion() uint64 {
 }
 
 func (ami *addMyIndex) Up() error {
-	fmt.Println("Executing seed test...Register")
-
 	opt := options.Index().SetName("my-index")
 	keys := bson.D{{"my-key", 1}}
 	model := mongo.IndexModel{Keys: keys, Options: opt}
@@ -50,17 +48,19 @@ func (ami *addMyIndex) Up() error {
 		return err
 	}
 
+	fmt.Println("Up:", ami.typing, ": ", ami.name, "executed with success")
+
 	return nil
 }
 
 func (ami *addMyIndex) Down() error {
-	fmt.Println("Executing seed test...Register")
-
 	_, err := ami.db.Collection("my-coll").Indexes().DropOne(context.TODO(), "my-index")
 	if err != nil {
 		fmt.Println(err.Error())
 		return err
 	}
+
+	fmt.Println("Down: ", ami.typing, ": ", ami.name, "executed with success")
 	return nil
 
 }

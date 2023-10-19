@@ -6,19 +6,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// MigrationFunc used to define actions to be performed for a migration.
 type MigrationFunc func(db *mongo.Database) error
 
-// Migration represents single database migration.
-// Migration contains:
-//
-// - version: migration version, must be unique in migration list
-//
-// - description: text description of migration
-//
-// - up: callback which will be called in "up" migration process
-//
-// - down: callback which will be called in "down" migration process for reverting changes
 type Migration struct {
 	Version     uint64
 	Description string

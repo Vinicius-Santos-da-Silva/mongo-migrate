@@ -1,13 +1,6 @@
 package main
 
 import (
-	// "context"
-	// "fmt"
-	// "time"
-
-	// migrate "github.com/Vinicius-Santos-da-Silva/mongo-migrate"
-	// "go.mongodb.org/mongo-driver/mongo"
-	// "go.mongodb.org/mongo-driver/mongo/options"
 	"fmt"
 
 	pkg "github.com/Vinicius-Santos-da-Silva/mongo-migrate/pkg"
