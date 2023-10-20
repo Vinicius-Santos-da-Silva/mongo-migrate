@@ -10,8 +10,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-const migrationsPath = "file://path/to/your/migrations"
-
 type MigrationRepositoryMySQL struct {
 	db *sql.DB
 }
@@ -30,10 +28,10 @@ func (erm *MigrationRepositoryMySQL) Insert(rec *entity.VersionRecord) (*entity.
 
 func (erm *MigrationRepositoryMySQL) FindOne(record *entity.VersionRecord) (*entity.VersionRecord, error) {
 	var output entity.VersionRecord
-	err := erm.db.QueryRow("SELECT version, description, type FROM migrations WHERE version = ? AND description = ? AND type = ?", record.Version, record.Description, record.Type).Scan(&output.Version, &output.Description, &output.Type)
+	err := erm.db.QueryRow("SELECT version, description, type FROM "+tableName+" WHERE version = ? AND description = ? AND type = ?", record.Version, record.Description, record.Type).Scan(&output.Version, &output.Description, &output.Type)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
-		return nil, nil
+		return &entity.VersionRecord{}, nil
 	case err != nil:
 		return nil, err
 	}
@@ -41,11 +39,15 @@ func (erm *MigrationRepositoryMySQL) FindOne(record *entity.VersionRecord) (*ent
 }
 
 func (erm *MigrationRepositoryMySQL) CreateCollectionIfNotExists(name string) error {
+
 	createTableQuery := fmt.Sprintf(`
 		CREATE TABLE IF NOT EXISTS %s (
-			id INT AUTO_INCREMENT PRIMARY KEY,
-			nome VARCHAR(255),
-			idade INT
+			_id int NOT NULL AUTO_INCREMENT,
+			type varchar(255) DEFAULT NULL,
+			description varchar(255) DEFAULT NULL,
+			version int DEFAULT NULL,
+			timestamp datetime DEFAULT NULL,
+			PRIMARY KEY (_id)
 		);
 	`, tableName)
 
@@ -53,13 +55,10 @@ func (erm *MigrationRepositoryMySQL) CreateCollectionIfNotExists(name string) er
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("Tabela criada ou já existente.")
-
 	return nil
 }
 
-const (
+var (
 	username  = "root"
 	password  = ""
 	hostname  = "localhost"
