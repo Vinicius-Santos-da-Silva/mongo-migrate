@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	pkg "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/pkg"
-	repository "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/repository"
-	seeds "github.com/Vinicius-Santos-da-Silva/mongo-migrate/tests/seed"
+	pkg "github.com/iamviniciuss/golang-migrations/src/pkg"
+	repository "github.com/iamviniciuss/golang-migrations/src/repository"
+	seeds "github.com/iamviniciuss/golang-migrations/tests/seed"
 )
 
 func main() {

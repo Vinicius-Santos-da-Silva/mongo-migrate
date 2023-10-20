@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	entity "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/dto"
+	entity "github.com/iamviniciuss/golang-migrations/src/dto"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

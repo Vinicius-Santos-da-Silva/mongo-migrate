@@ -1,7 +1,7 @@
 package adapter
 
 import (
-	entity "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/dto"
+	entity "github.com/iamviniciuss/golang-migrations/src/dto"
 )
 
 type MigrationRepository interface {

@@ -1,4 +1,4 @@
-module github.com/Vinicius-Santos-da-Silva/mongo-migrate
+module github.com/iamviniciuss/golang-migrations
 
 go 1.20
 

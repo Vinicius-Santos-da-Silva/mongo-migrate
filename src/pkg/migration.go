@@ -1,6 +1,6 @@
 package migrate
 
-import "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/adapter"
+import "github.com/iamviniciuss/golang-migrations/src/adapter"
 
 type Migration struct {
 	Version     uint64

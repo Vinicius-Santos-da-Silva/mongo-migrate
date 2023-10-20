@@ -1,6 +1,6 @@
 package seed
 
-import "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/repository"
+import "github.com/iamviniciuss/golang-migrations/src/repository"
 
 type addMyIndexUser struct {
 	typing     string

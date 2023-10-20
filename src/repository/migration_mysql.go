@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 
-	entity "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/dto"
 	_ "github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	entity "github.com/iamviniciuss/golang-migrations/src/dto"
 	"github.com/pkg/errors"
 )
 

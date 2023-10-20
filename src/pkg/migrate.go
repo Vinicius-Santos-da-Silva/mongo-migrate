@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	repository "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/adapter"
-	entity "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/dto"
+	repository "github.com/iamviniciuss/golang-migrations/src/adapter"
+	entity "github.com/iamviniciuss/golang-migrations/src/dto"
 )
 
 const defaultMigrationsCollection = "migrations"
