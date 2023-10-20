@@ -62,5 +62,4 @@ func (ami *addMyIndex) Down() error {
 
 	fmt.Println("Down: ", ami.typing, ": ", ami.name, "executed with success")
 	return nil
-
 }

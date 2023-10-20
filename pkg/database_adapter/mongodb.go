@@ -1,0 +1,137 @@
+package repository
+
+import (
+	"context"
+
+	"github.com/Vinicius-Santos-da-Silva/mongo-migrate/pkg/entity"
+	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+const defaultMigrationsCollection = "migrations"
+
+const AllAvailable = -1
+
+type CollectionSpecification struct {
+	Name string `bson:"name"`
+	Type string `bson:"type"`
+}
+
+type MigrationRepositoryMongo struct {
+	db *mongo.Database
+}
+
+func NewMigrationRepositoryMongo(db *mongo.Database) *MigrationRepositoryMongo {
+	return &MigrationRepositoryMongo{db}
+}
+
+func (erm *MigrationRepositoryMongo) Insert(rec *entity.VersionRecord) (*entity.VersionRecord, error) {
+	_, err := erm.db.Collection(defaultMigrationsCollection).InsertOne(context.TODO(), rec)
+	if err != nil {
+		return rec, err
+	}
+
+	return rec, nil
+}
+
+func (erm *MigrationRepositoryMongo) FindOne() (*entity.VersionRecord, error) {
+
+	filter := bson.D{{}}
+	sort := bson.D{bson.E{Key: "_id", Value: -1}}
+	options := options.FindOne().SetSort(sort)
+
+	// find record with greatest id (assuming it`s latest also)
+	result := erm.db.Collection(defaultMigrationsCollection).FindOne(context.TODO(), filter, options)
+	err := result.Err()
+	switch {
+	case err == mongo.ErrNoDocuments:
+		return nil, err
+	case err != nil:
+		return nil, err
+	}
+
+	var rec entity.VersionRecord
+	if err := result.Decode(&rec); err != nil {
+		return nil, err
+	}
+
+	return &rec, nil
+}
+
+func (erm *MigrationRepositoryMongo) FindAll() ([]*entity.VersionRecord, error) {
+	return nil, nil
+}
+
+func (erm *MigrationRepositoryMongo) isCollectionExist(name string) (isExist bool, err error) {
+	collections, err := erm.getCollections()
+	if err != nil {
+		return false, err
+	}
+
+	for _, c := range collections {
+		if name == c.Name {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (erm *MigrationRepositoryMongo) CreateCollectionIfNotExists(name string) error {
+	exist, err := erm.isCollectionExist(name)
+	if err != nil {
+		return err
+	}
+	if exist {
+		return nil
+	}
+
+	command := bson.D{bson.E{Key: "create", Value: name}}
+	err = erm.db.RunCommand(nil, command).Err()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (erm *MigrationRepositoryMongo) getCollections() (collections []CollectionSpecification, err error) {
+	filter := bson.D{bson.E{Key: "type", Value: "collection"}}
+	options := options.ListCollections().SetNameOnly(true)
+
+	cursor, err := erm.db.ListCollections(context.Background(), filter, options)
+	if err != nil {
+		return nil, err
+	}
+
+	if cursor != nil {
+		defer func(cursor *mongo.Cursor) {
+			curErr := cursor.Close(context.TODO())
+			if curErr != nil {
+				if err != nil {
+					err = errors.Wrapf(curErr, "migrate: get collection failed: %s", err.Error())
+				} else {
+					err = curErr
+				}
+			}
+		}(cursor)
+	}
+
+	for cursor.Next(context.TODO()) {
+		var collection CollectionSpecification
+
+		err := cursor.Decode(&collection)
+		if err != nil {
+			return nil, err
+		}
+
+		collections = append(collections, collection)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return
+}

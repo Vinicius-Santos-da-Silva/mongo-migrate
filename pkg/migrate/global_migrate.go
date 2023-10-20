@@ -35,6 +35,10 @@ func SetDatabase(db *mongo.Database) {
 	globalMigrate.db = db
 }
 
+func SetRepository(repo MigrationRepository) {
+	globalMigrate.migrationRepository = repo
+}
+
 func SetMigrationsCollection(name string) {
 	globalMigrate.SetMigrationsCollection(name)
 }
