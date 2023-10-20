@@ -10,10 +10,10 @@ import (
 )
 
 // export MONGO_URL=mongodb://localhost:27017
-func MongoConnect(database string) (*mongo.Database, error) {
+func MongoConnect(databaseHost string, databaseName string) (*mongo.Database, error) {
 	var db *mongo.Database
 
-	uri := fmt.Sprintf("mongodb://localhost:27017")
+	uri := fmt.Sprintf(databaseHost + "/" + databaseName)
 	opt := options.Client().ApplyURI(uri)
 	client, err := mongo.NewClient(opt)
 	if err != nil {
@@ -26,7 +26,7 @@ func MongoConnect(database string) (*mongo.Database, error) {
 		return nil, err
 	}
 
-	db = client.Database(database)
+	db = client.Database(databaseName)
 
 	return db, nil
 }

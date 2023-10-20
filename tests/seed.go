@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	// database "github.com/iamviniciuss/golang-migrations/src/database"
 	pkg "github.com/iamviniciuss/golang-migrations/src/pkg"
 	repository "github.com/iamviniciuss/golang-migrations/src/repository"
 	seeds "github.com/iamviniciuss/golang-migrations/tests/seed"
@@ -11,7 +12,7 @@ import (
 func main() {
 	fmt.Println("Up seeds...")
 
-	database, err := pkg.MongoConnect("test-migrations")
+	database, err := pkg.MongoConnect("mongodb://localhost:27017", "test-migration01")
 
 	if err != nil {
 		panic(err)
