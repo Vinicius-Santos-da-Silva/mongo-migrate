@@ -3,8 +3,7 @@ package migrate
 import (
 	"fmt"
 
-	"github.com/Vinicius-Santos-da-Silva/mongo-migrate/pkg/repository"
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/repository"
 )
 
 var globalMigrate = NewMigrate(nil)
@@ -32,10 +31,6 @@ func RegisteredMigrations() []Migration {
 	return ret
 }
 
-func SetDatabase(db *mongo.Database) {
-	globalMigrate.db = db
-}
-
 func SetRepository(repo repository.MigrationRepository) {
 	globalMigrate.migrationRepository = repo
 }
@@ -43,10 +38,6 @@ func SetRepository(repo repository.MigrationRepository) {
 func SetMigrationsCollection(name string) {
 	globalMigrate.SetMigrationsCollection(name)
 }
-
-// func Version() (uint64, string, error) {
-// 	return globalMigrate.Version()
-// }
 
 func Up(n int) error {
 	return globalMigrate.Up(n)

@@ -3,8 +3,8 @@ package migrate
 import (
 	"time"
 
-	"github.com/Vinicius-Santos-da-Silva/mongo-migrate/pkg/entity"
-	"github.com/Vinicius-Santos-da-Silva/mongo-migrate/pkg/repository"
+	"github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/entity"
+	"github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/repository"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -13,8 +13,8 @@ const defaultMigrationsCollection = "migrations"
 const AllAvailable = -1
 
 type Migrate struct {
-	migrationRepository  repository.MigrationRepository
-	db                   *mongo.Database
+	migrationRepository repository.MigrationRepository
+	// db                   *mongo.Database
 	migrations           []Migration
 	migrationsCollection string
 }
@@ -23,7 +23,7 @@ func NewMigrate(db *mongo.Database, migrations ...Migration) *Migrate {
 	internalMigrations := make([]Migration, len(migrations))
 	copy(internalMigrations, migrations)
 	return &Migrate{
-		db:                   db,
+		// db:                   db,
 		migrations:           internalMigrations,
 		migrationsCollection: defaultMigrationsCollection,
 	}

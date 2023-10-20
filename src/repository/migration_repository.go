@@ -1,6 +1,6 @@
 package repository
 
-import "github.com/Vinicius-Santos-da-Silva/mongo-migrate/pkg/entity"
+import "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/entity"
 
 type MigrationRepository interface {
 	Insert(rec *entity.VersionRecord) (*entity.VersionRecord, error)
