@@ -14,11 +14,6 @@ const defaultMigrationsCollection = "migrations"
 
 const AllAvailable = -1
 
-type CollectionSpecification struct {
-	Name string `bson:"name"`
-	Type string `bson:"type"`
-}
-
 type MigrationRepositoryMongo struct {
 	db *mongo.Database
 }
@@ -36,13 +31,12 @@ func (erm *MigrationRepositoryMongo) Insert(rec *entity.VersionRecord) (*entity.
 	return rec, nil
 }
 
-func (erm *MigrationRepositoryMongo) FindOne() (*entity.VersionRecord, error) {
+func (erm *MigrationRepositoryMongo) FindOne(reccord *entity.VersionRecord) (*entity.VersionRecord, error) {
 
-	filter := bson.D{{}}
+	filter := bson.M{"version": reccord.Version, "description": reccord.Description, "type": reccord.Type}
 	sort := bson.D{bson.E{Key: "_id", Value: -1}}
 	options := options.FindOne().SetSort(sort)
 
-	// find record with greatest id (assuming it`s latest also)
 	result := erm.db.Collection(defaultMigrationsCollection).FindOne(context.TODO(), filter, options)
 	err := result.Err()
 	switch {
@@ -52,12 +46,12 @@ func (erm *MigrationRepositoryMongo) FindOne() (*entity.VersionRecord, error) {
 		return nil, err
 	}
 
-	var rec entity.VersionRecord
-	if err := result.Decode(&rec); err != nil {
+	var output entity.VersionRecord
+	if err := result.Decode(&output); err != nil {
 		return nil, err
 	}
 
-	return &rec, nil
+	return &output, nil
 }
 
 func (erm *MigrationRepositoryMongo) FindAll() ([]*entity.VersionRecord, error) {
@@ -96,7 +90,7 @@ func (erm *MigrationRepositoryMongo) CreateCollectionIfNotExists(name string) er
 	return nil
 }
 
-func (erm *MigrationRepositoryMongo) getCollections() (collections []CollectionSpecification, err error) {
+func (erm *MigrationRepositoryMongo) getCollections() (collections []entity.CollectionSpecification, err error) {
 	filter := bson.D{bson.E{Key: "type", Value: "collection"}}
 	options := options.ListCollections().SetNameOnly(true)
 
@@ -119,7 +113,7 @@ func (erm *MigrationRepositoryMongo) getCollections() (collections []CollectionS
 	}
 
 	for cursor.Next(context.TODO()) {
-		var collection CollectionSpecification
+		var collection entity.CollectionSpecification
 
 		err := cursor.Decode(&collection)
 		if err != nil {

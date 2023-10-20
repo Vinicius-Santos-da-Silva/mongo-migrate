@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Vinicius-Santos-da-Silva/mongo-migrate/pkg/entity"
+	"github.com/Vinicius-Santos-da-Silva/mongo-migrate/pkg/repository"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -11,15 +12,8 @@ const defaultMigrationsCollection = "migrations"
 
 const AllAvailable = -1
 
-type MigrationRepository interface {
-	Insert(rec *entity.VersionRecord) (*entity.VersionRecord, error)
-	FindAll() ([]*entity.VersionRecord, error)
-	FindOne() (*entity.VersionRecord, error)
-	CreateCollectionIfNotExists(name string) error
-}
-
 type Migrate struct {
-	migrationRepository  MigrationRepository
+	migrationRepository  repository.MigrationRepository
 	db                   *mongo.Database
 	migrations           []Migration
 	migrationsCollection string
@@ -39,12 +33,12 @@ func (m *Migrate) SetMigrationsCollection(name string) {
 	m.migrationsCollection = name
 }
 
-func (m *Migrate) Version() (uint64, string, error) {
+func (m *Migrate) Version(rec *entity.VersionRecord) (uint64, string, error) {
 	if err := m.migrationRepository.CreateCollectionIfNotExists(m.migrationsCollection); err != nil {
 		return 0, "", err
 	}
 
-	rec, err := m.migrationRepository.FindOne()
+	rec, err := m.migrationRepository.FindOne(rec)
 
 	if err != nil {
 		return 0, "", nil
@@ -67,10 +61,7 @@ func (m *Migrate) SetVersion(version uint64, description string, typing string) 
 }
 
 func (m *Migrate) Up(n int) error {
-	currentVersion, _, err := m.Version()
-	if err != nil {
-		return err
-	}
+
 	if n <= 0 || n > len(m.migrations) {
 		n = len(m.migrations)
 	}
@@ -78,6 +69,17 @@ func (m *Migrate) Up(n int) error {
 
 	for i, p := 0, 0; i < len(m.migrations) && p < n; i++ {
 		migration := m.migrations[i]
+
+		currentVersion, _, err := m.Version(&entity.VersionRecord{
+			Type:        migration.Handler.GetType(),
+			Version:     migration.Version,
+			Description: migration.Handler.GetName(),
+		})
+
+		if err != nil {
+			return err
+		}
+
 		if migration.Version <= currentVersion || migration.Handler == nil {
 			continue
 		}
@@ -93,10 +95,7 @@ func (m *Migrate) Up(n int) error {
 }
 
 func (m *Migrate) Down(n int) error {
-	currentVersion, _, err := m.Version()
-	if err != nil {
-		return err
-	}
+
 	if n <= 0 || n > len(m.migrations) {
 		n = len(m.migrations)
 	}
@@ -104,6 +103,17 @@ func (m *Migrate) Down(n int) error {
 
 	for i, p := len(m.migrations)-1, 0; i >= 0 && p < n; i-- {
 		migration := m.migrations[i]
+
+		currentVersion, _, err := m.Version(&entity.VersionRecord{
+			Type:        migration.Handler.GetType(),
+			Version:     migration.Version,
+			Description: migration.Handler.GetName(),
+		})
+
+		if err != nil {
+			return err
+		}
+
 		if migration.Version > currentVersion || migration.Handler == nil {
 			continue
 		}

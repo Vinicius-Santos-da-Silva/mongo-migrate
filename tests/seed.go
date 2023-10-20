@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	repository "github.com/Vinicius-Santos-da-Silva/mongo-migrate/pkg/database_adapter"
+	repository "github.com/Vinicius-Santos-da-Silva/mongo-migrate/pkg/adapter"
 	pkg "github.com/Vinicius-Santos-da-Silva/mongo-migrate/pkg/migrate"
 	seeds "github.com/Vinicius-Santos-da-Silva/mongo-migrate/tests/seed"
 )
@@ -21,11 +21,8 @@ func main() {
 	repo := repository.NewMigrationRepositoryMongo(database)
 	pkg.SetRepository(repo)
 
-	pkg.Register(seeds.NewAddMyIndex(database))
-	pkg.Register(seeds.NewAddMyIndex(database))
-	pkg.Register(seeds.NewAddMyIndex(database))
-	pkg.Register(seeds.NewAddMyIndex(database))
-	pkg.Register(seeds.NewAddMyIndex(database))
+	// pkg.Register(seeds.NewAddMyIndex(database))
+	pkg.Register(seeds.NewAddMyIndexUser(database))
 
 	if err := pkg.Up(pkg.AllAvailable); err != nil {
 		panic(err)
