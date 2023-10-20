@@ -1,11 +1,11 @@
 package migrate
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/entity"
-	"github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/repository"
-	"go.mongodb.org/mongo-driver/mongo"
+	repository "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/adapter"
+	entity "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/dto"
 )
 
 const defaultMigrationsCollection = "migrations"
@@ -13,19 +13,18 @@ const defaultMigrationsCollection = "migrations"
 const AllAvailable = -1
 
 type Migrate struct {
-	migrationRepository repository.MigrationRepository
-	// db                   *mongo.Database
+	migrationRepository  repository.MigrationRepository
 	migrations           []Migration
 	migrationsCollection string
 }
 
-func NewMigrate(db *mongo.Database, migrations ...Migration) *Migrate {
+func NewMigrate(migrationRepository repository.MigrationRepository, migrations ...Migration) *Migrate {
 	internalMigrations := make([]Migration, len(migrations))
 	copy(internalMigrations, migrations)
 	return &Migrate{
-		// db:                   db,
 		migrations:           internalMigrations,
 		migrationsCollection: defaultMigrationsCollection,
+		migrationRepository:  migrationRepository,
 	}
 }
 
@@ -69,7 +68,6 @@ func (m *Migrate) Up(n int) error {
 
 	for i, p := 0, 0; i < len(m.migrations) && p < n; i++ {
 		migration := m.migrations[i]
-
 		currentVersion, _, err := m.Version(&entity.VersionRecord{
 			Type:        migration.Handler.GetType(),
 			Version:     migration.Version,
@@ -133,4 +131,21 @@ func (m *Migrate) Down(n int) error {
 		}
 	}
 	return nil
+}
+
+func (mig *Migrate) internalRegister(migrationHandler repository.MigrationHandler, skip int) error {
+	if hasVersion(mig.migrations, migrationHandler.GetVersion()) {
+		return fmt.Errorf("migration with version %v already registered", migrationHandler.GetVersion())
+	}
+
+	mig.migrations = append(mig.migrations, Migration{
+		Version:     migrationHandler.GetVersion(),
+		Description: migrationHandler.GetName(),
+		Handler:     migrationHandler,
+	})
+	return nil
+}
+
+func (mig *Migrate) Register(migrationHandler repository.MigrationHandler) error {
+	return mig.internalRegister(migrationHandler, 2)
 }

@@ -1,4 +1,4 @@
-package repository
+package adapter
 
 import (
 	entity "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/dto"

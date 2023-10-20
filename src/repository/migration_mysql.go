@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/entity"
+	entity "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/dto"
 	_ "github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/pkg/errors"
@@ -40,12 +40,7 @@ func (erm *MigrationRepositoryMySQL) FindOne(record *entity.VersionRecord) (*ent
 	return &output, nil
 }
 
-func (erm *MigrationRepositoryMySQL) FindAll() ([]*entity.VersionRecord, error) {
-	return nil, nil
-}
-
 func (erm *MigrationRepositoryMySQL) CreateCollectionIfNotExists(name string) error {
-	// Query para criar a tabela se ela não existir
 	createTableQuery := fmt.Sprintf(`
 		CREATE TABLE IF NOT EXISTS %s (
 			id INT AUTO_INCREMENT PRIMARY KEY,

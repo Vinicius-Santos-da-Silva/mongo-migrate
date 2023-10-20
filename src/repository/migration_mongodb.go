@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/entity"
+	entity "github.com/Vinicius-Santos-da-Silva/mongo-migrate/src/dto"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -52,10 +52,6 @@ func (erm *MigrationRepositoryMongo) FindOne(reccord *entity.VersionRecord) (*en
 	}
 
 	return &output, nil
-}
-
-func (erm *MigrationRepositoryMongo) FindAll() ([]*entity.VersionRecord, error) {
-	return nil, nil
 }
 
 func (erm *MigrationRepositoryMongo) isCollectionExist(name string) (isExist bool, err error) {

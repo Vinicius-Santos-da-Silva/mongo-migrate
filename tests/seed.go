@@ -17,25 +17,23 @@ func main() {
 		panic(err)
 	}
 
-	mysqlconn, err := repository.NewConnection()
+	// mysqlconn, err := repository.NewConnection()
 
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	defer mysqlconn.Close()
+	// defer mysqlconn.Close()
 
 	// migrationRepo := repository.NewMigrationRepositoryMySQL(mysqlconn)
 	migrationRepo := repository.NewMigrationRepositoryMongo(database)
-	pkg.SetRepository(migrationRepo)
-
 	onlineReviewRepo := repository.NewOnlineRepositoryMongo(database)
 
-	// pkg.Register(seeds.NewAddMyIndex(database))
-	pkg.Register(seeds.NewAddMyIndexUser(onlineReviewRepo))
+	migrationManager := pkg.NewMigrate(migrationRepo)
+	migrationManager.Register(seeds.NewAddMyIndexUser(onlineReviewRepo))
+	migrationManager.Register(seeds.NewAddMyIndex(database))
 
-	if err := pkg.Up(pkg.AllAvailable); err != nil {
+	if err := migrationManager.Up(pkg.AllAvailable); err != nil {
 		panic(err)
 	}
-
 }
