@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strconv"
 
 	_ "github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -69,7 +70,14 @@ var (
 )
 
 func NewConnection() (*sql.DB, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", username, password, hostname, port, dbName)
+	dbPort, err := strconv.Atoi(port)
+
+	if err != nil {
+		fmt.Println("Erro ao converter a string para um número inteiro:", err)
+		return nil, err
+	}
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", username, password, hostname, dbPort, dbName)
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
