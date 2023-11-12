@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"os"
 
 	_ "github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -59,12 +60,12 @@ func (erm *MigrationRepositoryMySQL) CreateCollectionIfNotExists(name string) er
 }
 
 var (
-	username  = "root"
-	password  = ""
-	hostname  = "localhost"
-	port      = 3306
-	dbName    = "wallet"
-	tableName = "migrations"
+	username  = os.Getenv("MIGRATION_USERNAME")
+	password  = os.Getenv("MIGRATION_PASSWORD")
+	hostname  = os.Getenv("MIGRATION_HOSTNAME")
+	port      = os.Getenv("MIGRATION_PORT")
+	dbName    = os.Getenv("MIGRATION_DB")
+	tableName = os.Getenv("MIGRATION_TABLE")
 )
 
 func NewConnection() (*sql.DB, error) {
