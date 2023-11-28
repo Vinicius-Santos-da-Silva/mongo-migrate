@@ -1,6 +1,10 @@
 package migrate
 
-import "sort"
+import (
+	"sort"
+
+	repository "github.com/iamviniciuss/golang-migrations/src/adapter"
+)
 
 func migrationSort(migrations []Migration) {
 	sort.Slice(migrations, func(i, j int) bool {
@@ -8,9 +12,9 @@ func migrationSort(migrations []Migration) {
 	})
 }
 
-func hasVersion(migrations []Migration, version uint64) bool {
+func hasVersion(migrations []Migration, current repository.MigrationHandler) bool {
 	for _, m := range migrations {
-		if m.Version == version {
+		if m.Description == current.GetName() && m.Version == current.GetVersion() {
 			return true
 		}
 	}
