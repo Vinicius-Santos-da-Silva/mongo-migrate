@@ -134,7 +134,7 @@ func (m *Migrate) Down(n int) error {
 }
 
 func (mig *Migrate) internalRegister(migrationHandler repository.MigrationHandler, skip int) error {
-	if hasVersion(mig.migrations, migrationHandler.GetVersion()) {
+	if hasVersion(mig.migrations, migrationHandler) {
 		return fmt.Errorf("migration with version %v already registered", migrationHandler.GetVersion())
 	}
 
