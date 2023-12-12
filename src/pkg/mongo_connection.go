@@ -2,7 +2,6 @@ package migrate
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,8 +12,7 @@ import (
 func MongoConnect(databaseHost string, databaseName string) (*mongo.Database, error) {
 	var db *mongo.Database
 
-	uri := fmt.Sprintf(databaseHost + "/" + databaseName)
-	opt := options.Client().ApplyURI(uri)
+	opt := options.Client().ApplyURI(databaseHost)
 	client, err := mongo.NewClient(opt)
 	if err != nil {
 		return nil, err
