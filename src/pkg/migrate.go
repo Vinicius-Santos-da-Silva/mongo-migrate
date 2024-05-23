@@ -54,9 +54,9 @@ func (m *Migrate) SetVersion(version uint64, description string, typing string) 
 		Type:        typing,
 	}
 
-	m.migrationRepository.Insert(rec)
+	_, err := m.migrationRepository.Insert(rec)
 
-	return nil
+	return err
 }
 
 func (m *Migrate) Up(n int) error {
